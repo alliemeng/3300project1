@@ -1,1 +1,478 @@
-Hello World
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+ 
+  </style>
+  <meta charset="utf-8">
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href='style.css' type='text/css'>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<body>
+<h1>Most Popular Startup Cities and Their Economies</h1>
+
+<p class="title">An Overview of the Cities</p>
+<p class="description">Each state is grouped by color, cities are displayed geographically from left to right (mapping from west to east). Notice that costal cities usually have more startups, while California is the most popular state.</p>
+<script>
+
+    var margin1 = {top: 20, right: 20, bottom: 110, left: 70};
+    var width1 = 1000 - margin1.left - margin1.right;
+    var height1 = 500 - margin1.top - margin1.bottom;
+
+    var colorArray = [
+      //red
+      "#e7969c", "#e7969c", "#e7969c", "#e7969c", "#e7969c", "#e7969c",
+      //orange-red
+      "#ea9b7e",
+      //orange
+      "#fdd0a2",  
+      //yellow-green
+      "#cedb9c", "#cedb9c", 
+      //green
+      "#c7e9c0", 
+      //light blue
+      "#c6dbef", "#c6dbef", 
+      //indigo
+      "#bcbddc", 
+      //violet
+      "#9c9ede", 
+      //purple
+      "#de9ed6", "#de9ed6", 
+      //magenta
+      "#f7b6d2", 
+      //red again
+      "#e7969c",
+      //grey
+      "#ea9b7e",];
+
+    var color = d3.scale.ordinal()
+        .range(colorArray);
+
+    var x1 = d3.scale.ordinal()
+        .rangeRoundBands([0, width1], .1);
+
+    var y1 = d3.scale.linear()
+        .range([height1, 0]);
+
+    var xAxis1 = d3.svg.axis() 
+        .scale(x1)
+        .orient("bottom");
+
+    var yAxis1 = d3.svg.axis()
+        .scale(y1)
+        .ticks(5)
+        .outerTickSize(0)
+        .orient("left");
+
+    var svg1 = d3.select("body").append("svg")
+        .attr("width", width1 + margin1.left + margin1.right)
+        .attr("height", height1 + margin1.top + margin1.bottom)
+        .append("g")
+            .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+
+    // load tsv formatted data
+    d3.tsv("data/city-startup.tsv", type, function(error, data) {
+        x1.domain(data.map(function(d) { return d.city; }));
+        y1.domain([0, d3.max(data, function(d) { return d.startups; })]);
+
+        svg1.selectAll("text")
+            .data(data)
+            .enter().append("text")
+                .attr("class", "values")
+                .attr("x", function(d) { return x1(d.city) + x1.rangeBand()/2; })
+                .attr("y", function(d) { return y1(d.startups); })
+                .attr("dy", -5)
+                .attr("text-anchor", "middle")
+                .text(function(d) { return d.startups; });
+
+        svg1.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height1 + ")")
+            .call(xAxis1)
+            .selectAll("text")
+                .attr("transform", "translate(-15,50), rotate(-65)");
+
+        svg1.append("g")
+            .attr("class", "y axis")
+            .call(yAxis1)
+            .append("text")
+                .attr("transform", "translate(-45,0), rotate(-90)")
+                .attr("y", 6)
+                .style("text-anchor", "end")
+                .text("Number of Startups");
+
+        svg1.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x1(d.city); })
+                .attr("width", x1.rangeBand())
+                .attr("y", function(d) { return y1(d.startups); })
+                .attr("height", function(d) { return height1 - y1(d.startups); })
+                .style("fill", function(d) { return color(d.city); });
+
+        // load startup logos in the bars
+        var sanFranciscoImg = [ 
+        "img/san-francisco/airbnb.png",
+        "img/san-francisco/eventbrite.png",
+        "img/san-francisco/graphicly.png",
+        "img/san-francisco/miso.png",
+        "img/san-francisco/mulesoft.png",
+        "img/san-francisco/pinterest.png",
+        "img/san-francisco/scribd.png",
+        "img/san-francisco/square.png",
+        "img/san-francisco/stipple.png"];
+
+        var yPos = 7;
+
+        for (var i = 0; i < sanFranciscoImg.length; i++) {
+          svg1.append("svg1:image").data(data)
+          .attr("xlink:href", sanFranciscoImg[i])
+          .attr("x", function(d) { return x1("San Francisco") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+          yPos += 40;
+        }
+
+        var sanJoseImg = ["img/san-jose/leapmotion.png", 
+        "img/san-jose/lyft.png",
+        "img/san-jose/nextdoor.png",
+        "img/san-jose/watchsend.png"];
+
+        yPos = 205;
+        for (var i = 0; i < sanJoseImg.length; i++) {
+          svg1.append("svg:image").data(data)
+          .attr("xlink:href", sanJoseImg[i])
+          .attr("x", function(d) { return x1("San Jose") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+          yPos += 40;
+        }
+
+        var losAngelesImg = ["img/los-angeles/snapchat.png", 
+        "img/los-angeles/tastemade.png"];
+
+        yPos = 296;
+        for (var i = 0; i < losAngelesImg.length; i++) {
+          svg1.append("svg:image").data(data)
+          .attr("xlink:href", losAngelesImg[i])
+          .attr("x", function(d) { return x1("Los Angeles") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+          yPos += 36;
+        }
+
+        yPos = 331;
+        svg1.append("svg:image").data(data)
+          .attr("xlink:href", "img/seattle/swype.png")
+          .attr("x", function(d) { return x1("Seattle") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+        yPos = 331;
+        svg1.append("svg:image").data(data)
+          .attr("xlink:href", "img/austin/testilo.png")
+          .attr("x", function(d) { return x1("Austin") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+        yPos = 331;
+        svg1.append("svg:image").data(data)
+          .attr("xlink:href", "img/chicago/keeper.png")
+          .attr("x", function(d) { return x1("Chicago") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+        var washingtonImg = ["img/washingtondc/triptribe.png", 
+        "img/washingtondc/cover.png"];
+        yPos = 297;
+        for (var i = 0; i < washingtonImg.length; i++) {
+        svg1.append("svg:image").data(data)
+          .attr("xlink:href", washingtonImg[i])
+          .attr("x", function(d) { return x1("Washington D.C.") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+          yPos += 36;
+        }
+
+
+        var newYorkImg = ["img/new-york/adaptly.png", 
+        "img/new-york/draft.png",
+        "img/new-york/thumb.png",
+        "img/new-york/upworthy.png",
+        "img/new-york/wanderfly.png"];
+
+        yPos = 176;
+        for (var i = 0; i < newYorkImg.length; i++) {
+          svg1.append("svg:image").data(data)
+          .attr("xlink:href", newYorkImg[i])
+          .attr("x", function(d) { return x1("New York") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+          yPos += 38;
+        }
+
+        var bostonImg = ["img/boston/doordash.png", 
+        "img/boston/mustbin.png",
+        "img/boston/zwayo.png"];
+
+        yPos = 257;
+        for (var i = 0; i < bostonImg.length; i++) {
+          svg1.append("svg:image").data(data)
+          .attr("xlink:href", bostonImg[i])
+          .attr("x", function(d) { return x1("Boston") + 3; })
+          .attr("y", yPos)
+          .attr("width", 35)
+          .attr("height", 35);
+
+          yPos += 37;
+        }
+
+    });
+
+    function type(d) {
+      d.startups = +d.startups;
+      return d;
+    }
+
+</script>
+
+<p class="title">Startups vs. GDP</p>
+<p class="description">Every dot is represented by a city. See how the number of startups within a city affects its GDP or is affected by GDP. (Hint: the relationship between these two variables seems to be very random and sporadic!)</p>
+
+<script>
+
+var margin2 = {top: 20, right: 20, bottom: 30, left: 70};
+var width2 = 1000 - margin2.left - margin2.right;
+var height2 = 500 - margin2.top - margin2.bottom;
+
+var color2 = d3.scale.category20();
+
+var x2 = d3.scale.linear().range([0, width2-50]);
+
+var y2 = d3.scale.linear().range([height2, 0]);
+
+var y22 = d3.scale.linear().range([height2, 0]);
+
+//orient labels
+var xAxis2 = d3.svg.axis().scale(x2).orient("bottom");
+
+var yAxis2 = d3.svg.axis().scale(y2).orient("left");
+
+var yAxis22 = d3.svg.axis().scale(y22).orient("right");
+
+//Define Scatterplot
+var svg2 = d3.select("body").append("svg")
+    .attr("width", width2 + margin2.left + margin2.right)
+    .attr("height", height2 + margin2.top + margin2.bottom).append("g")
+    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+d3.tsv("data/gdpdata.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.financialData = +d.financialData;
+    d.numberOfStartups = +d.numberOfStartups;
+  });
+
+  x2.domain(d3.extent(data, function(d) { return d.numberOfStartups; })).nice();
+  y2.domain(d3.extent(data, function(d) { if (d.typeofFinancialData ==='Per Capita GDP'){
+			  return d.financialData;
+		  }})).nice();
+  y22.domain(d3.extent(data, function(d) { if (d.typeofFinancialData ==='GDP (Millions)'){
+			  return d.financialData;
+		  }})).nice();
+
+//x-axis
+ svg2.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height2 + ")") //axis placement
+      .call(xAxis2)
+      .append("text")
+      .attr("class", "label")
+      .attr("x", width2-50)
+      .attr("y", -6)
+      .attr("dx", -10)
+      .style("text-anchor", "end")
+      .text("Number of Startups");
+
+//y-axis
+  svg2.append("g")
+	  .attr("class", "y axis")
+      .style("fill", "steelblue")
+      .call(yAxis2)
+      .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("GDP Data");
+	  
+//y-axis2
+ svg2.append("g")
+      .attr("class", "y axis")
+      .style("fill", "lightblue")
+      .attr("transform", "translate("+(width2-50)+",0)")
+      .call(yAxis22)
+      .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("dy", "-.50em")
+      .style("text-anchor", "end")
+      .text("GDP Per Capita Data");
+
+
+//Create the dots on plot
+  svg2.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", 4)
+      .attr("cx", function(d) { return x2(d.numberOfStartups); })
+      .attr("cy", function(d) {
+		  if (d.typeofFinancialData ==='GDP (Millions)'){
+			  return y2(d.financialData);
+		  }
+		  else{
+			  return y22(d.financialData);
+		  }
+      })
+      .style("fill", function(d) { return color2(d.typeofFinancialData); });
+
+
+//Creating the legend
+  var legend2 = svg2.selectAll(".legend")
+      .data(color2.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend2.append("rect")
+      .attr("x", width2 - 103)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color2);
+
+  legend2.append("text")
+      .attr("x", width2 - 109)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+
+});
+</script>
+
+<p class="title">Startups vs. Income</p>
+<p class="description">Every dot is represented by a city. See how the number of startups within a city affects the median household income and the per capita income. While the correlation here is evident, we wonder whether these startups are the cause or the result of bringing income up/down.</p>
+
+<script>
+
+var margin3 = {top: 20, right: 20, bottom: 30, left: 70};
+var width3 = 950 - margin3.left - margin3.right;
+var height3 = 500 - margin3.top - margin3.bottom;
+
+var color3 = d3.scale.category20().range(["#2ca02c"
+,"#98df8a"]);
+
+var x3 = d3.scale.linear().range([0, width3]);
+
+var y3 = d3.scale.linear().range([height3, 0]);
+
+//orient labels
+var xAxis3 = d3.svg.axis().scale(x3).orient("bottom");
+
+var yAxis3 = d3.svg.axis().scale(y3).orient("left");
+
+//Define Scatterplot
+var svg3 = d3.select("body").append("svg")
+    .attr("width", width3 + margin3.left + margin3.right)
+    .attr("height", height3 + margin3.top + margin3.bottom).append("g")
+    .attr("transform", "translate(" + margin3.left + "," + margin3.top + ")");
+
+d3.tsv("data/incomedata.tsv", function(error, data) {
+  data.forEach(function(d) {
+    d.financialData = +d.financialData;
+    d.numberOfStartups = +d.numberOfStartups;
+  });
+
+  x3.domain(d3.extent(data, function(d) { return d.numberOfStartups; })).nice();
+  y3.domain(d3.extent(data, function(d) { return d.financialData; })).nice();
+
+// create x-axis
+ svg3.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height3 + ")")//axis placement
+      .call(xAxis3)
+      .append("text")
+      .attr("class", "label")
+      .attr("x", width3)
+      .attr("y", -6)
+      .attr("dx", -10)
+      .style("text-anchor", "end")
+      .text("Number of Startups");
+
+//create y-axis
+  svg3.append("g")
+      .attr("class", "y axis")
+      .call(yAxis3)
+      .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Income Data");
+
+
+// create the dots on plot
+  svg3.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", 4)
+      .attr("cx", function(d) { return x3(d.numberOfStartups); })
+      .attr("cy", function(d) { return y3(d.financialData); })
+      .style("fill", function(d) { return color3(d.typeofFinancialData); });
+
+
+// create the legend
+  var legend3 = svg3.selectAll(".legend")
+      .data(color3.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend3.append("rect")
+      .attr("x", width3 - 53)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color3);
+
+  legend3.append("text")
+      .attr("x", width3 - 59)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+body {
+	font-family: "Roboto Condensed";
+}
+h1 {
+	margin-left: 10px;
+}
+p.title {
+	margin-left: 10px;
+	font-size: 20px;
+}
+p.description {
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: 15px;
+}
+.bar {
+fill: #969696;
+}
+
+.axis {
+font: 15px "Roboto Condensed";
+}
+
+.axis path,
+.axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+.values {
+	font-size: 10px;
+}
